@@ -1,0 +1,4 @@
+import grpc.grpc
+
+actor gnmi(target: str):
+    pass
