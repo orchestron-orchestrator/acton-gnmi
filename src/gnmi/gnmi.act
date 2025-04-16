@@ -1,4 +1,24 @@
-import grpc.grpc
+import net
+import grpc.grpc as grpc
 
-actor gnmi(target: str):
-    pass
+actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False):
+
+    def _on_connect(channel: grpc.Channel):
+        on_connect(self)
+    def _on_error(channel: grpc.Channel, error: str):
+        on_error(self, error)
+
+    creds = None if insecure else grpc.TlsChannelCredentials()
+
+    channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error)
+
+actor main(env):
+
+    target = env.argv[1]
+
+    def on_connect(c: Client):
+        print("Client connected", target)
+    def on_error(c: Client, e: str):
+        print(e)
+
+    client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error)
