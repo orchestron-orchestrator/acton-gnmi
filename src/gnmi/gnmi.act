@@ -1,7 +1,15 @@
+import logging
 import net
 import grpc.grpc as grpc
 
-actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False):
+
+
+actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False, log_handler: ?logging.Handler, tls_verify: bool = True):
+
+    logh = logging.Handler("gnmi.Client")
+    if log_handler is not None:
+        logh.set_handler(log_handler)
+    logger = logging.Logger(logh)
 
     def _on_connect(channel: grpc.Channel):
         on_connect(self)
@@ -10,15 +18,26 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
 
     creds = None if insecure else grpc.TlsChannelCredentials()
 
-    channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error)
+    channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error, logh, tls_verify)
+
+    def _on_response(channel: grpc.Channel, response: bytes) -> None:
+        print(response)
+
+    def capabilities():
+        channel.unary_unary('/gnmi.gNMI/Capabilities', b'', _on_response)
 
 actor main(env):
+
+    logh = logging.Handler("gnmi.main")
+    logh.add_sink(logging.ConsoleSink())
+    logh.set_output_level(logging.DEBUG)
 
     target = env.argv[1]
 
     def on_connect(c: Client):
         print("Client connected", target)
+        c.capabilities()
     def on_error(c: Client, e: str):
-        print(e)
+        print("Error:", e)
 
-    client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error)
+    client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error, log_handler=logh, tls_verify=False)
