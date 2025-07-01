@@ -1,10 +1,10 @@
 import logging
 import net
+import base64
 import grpc.grpc as grpc
 
 
-
-actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False, log_handler: ?logging.Handler, tls_verify: bool = True):
+actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False, log_handler: ?logging.Handler, tls_verify: bool = True, basic_creds: ?(str, str) = None):
 
     logh = logging.Handler("gnmi.Client")
     if log_handler is not None:
@@ -18,13 +18,33 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
 
     creds = None if insecure else grpc.TlsChannelCredentials()
 
+    additional_headers: dict[str, str] = {}
+    if basic_creds is not None:
+        username, password = basic_creds
+        #creds_str = f'{username}:{password}'
+        #creds_enc = creds_str.encode()
+        #creds_b64: str = base64.encode(creds_enc).decode()
+        #auth_str: str = 'Basic ' + creds_b64
+        additional_headers['username'] = username
+        additional_headers['password'] = password
+
     channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error, logh, tls_verify)
 
     def _on_response(channel: grpc.Channel, response: bytes) -> None:
         print(response)
 
     def capabilities():
-        channel.unary_unary('/gnmi.gNMI/Capabilities', b'', _on_response)
+        channel.unary_unary('/gnmi.gNMI/Capabilities', b'', _on_response, additional_headers=additional_headers)
+
+    def get():
+        channel.unary_unary('/gnmi.gNMI/Get', b'', _on_response, additional_headers=additional_headers)
+
+    def set():
+        channel.unary_unary('/gnmi.gNMI/Set', b'', _on_response, additional_headers=additional_headers)
+
+    def subscribe():
+        channel.unary_unary('/gnmi.gNMI/Subscribe', b'', _on_response, additional_headers=additional_headers)
+
 
 actor main(env):
 
@@ -33,11 +53,24 @@ actor main(env):
     logh.set_output_level(logging.DEBUG)
 
     target = env.argv[1]
+    insecure = False
+    if len(env.argv) > 2:
+        insecure = bool(env.argv[2])
+
+    basic_creds = None
+    if len(env.argv) > 4:
+        username = env.argv[3]
+        password = env.argv[4]
+        basic_creds = (username, password)
 
     def on_connect(c: Client):
         print("Client connected", target)
+        #c.get()
+        #c.set()
         c.capabilities()
+        #c.subscribe()
     def on_error(c: Client, e: str):
         print("Error:", e)
 
-    client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error, log_handler=logh, tls_verify=False)
+    client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error, insecure=insecure, log_handler=logh, tls_verify=False, basic_creds=basic_creds)
+
