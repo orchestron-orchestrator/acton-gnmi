@@ -1,0 +1,80 @@
+def pack_CapabilityRequest(p: CapabilityRequest) -> bytes:
+    return b''
+
+class CapabilityRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_CapabilityRequest(self)
+
+def pack_CapabilityResponse(p: CapabilityResponse) -> bytes:
+    return b''
+
+class CapabilityResponse:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_CapabilityResponse(self)
+
+def pack_GetRequest(p: GetRequest) -> bytes:
+    return b''
+
+class GetRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_GetRequest(self)
+
+def pack_GetResponse(p: GetResponse) -> bytes:
+    return b''
+
+class GetResponse:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_GetResponse(self)
+
+def pack_SetRequest(p: SetRequest) -> bytes:
+    return b''
+
+class SetRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SetRequest(self)
+
+def pack_SetResponse(p: SetResponse) -> bytes:
+    return b''
+
+class SetResponse:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SetResponse(self)
+
+def pack_SubscribeRequest(p: SubscribeRequest) -> bytes:
+    NotImplemented
+
+class SubscribeRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SubscribeRequest(self)
+
+def pack_SubscribeResponse(p: SubscribeResponse) -> bytes:
+    return b''
+
+class SubscribeResponse:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SubscribeResponse(self)
+
