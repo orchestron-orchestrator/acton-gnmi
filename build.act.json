@@ -2,17 +2,17 @@
     "dependencies": {
         "grpc": {
             "repo_url": "https://github.com/actonlang/acton-grpc.git",
-            "url": "https://github.com/actonlang/acton-grpc/archive/8385969a6a40c33c63bbee67d8754a70a253967b.zip",
-            "hash": "1220dffdaeb27740655719e4d771e2853db00e099c9fe5380a0be33a62f3743591c6"
+            "url": "https://github.com/actonlang/acton-grpc/archive/01e4c7f59ea83df5536429cb2a7583901ad7cb45.zip",
+            "hash": "1220cc3f603a7c3070662906c5409d8c890ad16707683034b526a55527ee054964da"
         }
     },
     "zig_dependencies": {
         "gnmi": {
             "url": "https://github.com/ciaran2/gnmi/archive/refs/heads/zig-build.zip",
             "hash": "122063eafdc3d7e8e2187c86ea5a77257f77dc6a438aa5c69a7e150b05617c2c7241",
-	    "artifacts": [
+            "artifacts": [
                 "gnmi"
-	    ]
+            ]
         }
     }
 }
