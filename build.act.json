@@ -7,12 +7,5 @@
         }
     },
     "zig_dependencies": {
-        "gnmi": {
-            "url": "https://github.com/ciaran2/gnmi/archive/refs/heads/zig-build.zip",
-            "hash": "122063eafdc3d7e8e2187c86ea5a77257f77dc6a438aa5c69a7e150b05617c2c7241",
-            "artifacts": [
-                "gnmi"
-            ]
-        }
     }
 }

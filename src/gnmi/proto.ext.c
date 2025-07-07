@@ -1,4 +1,4 @@
-#include <gnmi/gnmi.pb-c.h>
+#include "gnmi/gnmi.pb-c.c"
 
 void gnmiQ_protoQ___ext_init__() {
    // NOP
