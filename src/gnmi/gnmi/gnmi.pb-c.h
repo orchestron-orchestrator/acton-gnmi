@@ -16,7 +16,7 @@ PROTOBUF_C__BEGIN_DECLS
 
 #include "google/protobuf/any.pb-c.c"
 #include "google/protobuf/descriptor.pb-c.c"
-#include "gnmi_ext/gnmi_ext.pb-c.c"
+#include "gnmi_ext.pb-c.c"
 
 typedef struct Gnmi__Notification Gnmi__Notification;
 typedef struct Gnmi__Update Gnmi__Update;
