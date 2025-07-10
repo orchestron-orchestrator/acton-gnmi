@@ -1,3 +1,45 @@
+#Encodings
+JSON = 0
+BYTES = 1
+PROTO = 2
+ASCII = 3
+JSON_IETF = 4
+
+# Subscription mode
+TARGET_DEFINED = 0
+ON_CHANGE = 1
+SAMPLE = 2
+
+# SubscriptionList mode
+STREAM = 0
+ONCE = 1
+POLL = 2
+
+
+class PathElem:
+    name: str
+    keys: list[(str, str)]
+
+    def __init__(self, name: str, keys: list[(str, str)]):
+        self.name = name
+        self.keys = keys
+
+class Path:
+    elems: list[PathElem]
+
+    def __init__(self, origin: str, elems: list[PathElem]):
+        self.elems = elems
+
+class ModelData:
+    name: str
+    organization: str
+    version: str
+
+    def __init__(self, name: str, organization: str, version: str):
+        self.name = name
+        self.organization = organization
+        self.version = version
+
 def pack_CapabilityRequest(p: CapabilityRequest) -> bytes:
     return b''
 
@@ -61,9 +103,46 @@ class SetResponse:
 def pack_SubscribeRequest(p: SubscribeRequest) -> bytes:
     NotImplemented
 
+class Subscription:
+    path: Path
+    mode: int
+    sample_interval: u64
+    suppress_redundant: bool
+    heartbeat_interval: u64
+
+    def __init__(self, path: Path, mode: int, sample_interval: u64, suppress_redundant: bool, heartbeat_interval: u64):
+        self.path = path
+        self.mode = mode
+        self.sample_interval = sample_interval
+        self.suppress_redundant = suppress_redundant
+        self.heartbeat_interval = heartbeat_interval
+        
+class SubscriptionList:
+    prefix: Path
+    subscriptions: list[Subscription]
+    qos: u32
+    mode: int
+    allow_aggregation: bool
+    use_models: list[ModelData]
+    encoding: int
+    updates_only: bool
+
+    def __init__(self, prefix: Path, subscriptions: list[Subscription], qos: u32, mode: int, allow_aggregation: bool, use_models: list[ModelData], encoding: int, updates_only: bool):
+        self.prefix = prefix
+        self.subscriptions = subscriptions
+        self.qos = qos
+        self.mode = mode
+        self.allow_aggregation = allow_aggregation
+        self.use_models = use_models
+        self.encoding = encoding
+        self.updates_only = updates_only
+
 class SubscribeRequest:
-    def __init__(self):
-        pass
+    # without a SubscriptionList, assume a poll request
+    subscribe: ?SubscriptionList
+
+    def __init__(self, subscribe: ?SubscriptionList):
+        self.subscribe = subscribe
 
     def pack(self) -> bytes:
         return pack_SubscribeRequest(self)
