@@ -26,9 +26,13 @@ class PathElem:
 
 class Path:
     elems: list[PathElem]
+    origin: str
+    target: str
 
-    def __init__(self, origin: str, elems: list[PathElem]):
+    def __init__(self, elems: list[PathElem], origin: str = '', target: str = ''):
         self.elems = elems
+        self.origin = origin
+        self.target = target
 
 class ModelData:
     name: str
