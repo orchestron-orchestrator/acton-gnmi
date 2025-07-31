@@ -2,7 +2,7 @@ import logging
 import net
 import base64
 import grpc.grpc as grpc
-import gnmi.proto
+import gnmi.proto as proto
 
 
 actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> None, on_error: action(Client, str) -> None, insecure = False, log_handler: ?logging.Handler, tls_verify: bool = True, basic_creds: ?(str, str) = None):
@@ -43,8 +43,21 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
     def set():
         channel.unary_unary('/gnmi.gNMI/Set', b'', _on_response, additional_headers=additional_headers)
 
-    def subscribe():
-        channel.unary_unary('/gnmi.gNMI/Subscribe', b'', _on_response, additional_headers=additional_headers)
+    def subscribe(prefix: proto.Path, paths: list[proto.Path], mode: int, stream_mode: int, sample_interval):
+
+        allow_aggregation = False
+        qos = 0
+        encoding = proto.PROTO
+        updates_only = False
+        subscriptions: list[proto.Subscription] = []
+        use_models: list[proto.ModelData] = []
+
+        for path in paths:
+            subscriptions.append(proto.Subscription(path, mode, sample_interval, False, sample_interval))
+
+        request = proto.SubscribeRequest(proto.SubscriptionList(prefix, subscriptions, qos, mode, allow_aggregation, use_models, encoding, updates_only))
+        payload: bytes = request.pack()
+        channel.unary_unary('/gnmi.gNMI/Subscribe', request.pack(), _on_response, additional_headers=additional_headers)
 
 
 actor main(env):
@@ -68,10 +81,19 @@ actor main(env):
         print("Client connected", target)
         #c.get()
         #c.set()
-        c.capabilities()
-        #c.subscribe()
+        #c.capabilities()
+        c.subscribe(proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('counters', []), proto.PathElem('in-pkts', [])]), proto.Path([proto.PathElem('counters', []), proto.PathElem('out-pkts', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
     def on_error(c: Client, e: str):
         print("Error:", e)
 
     client = Client(net.TCPConnectCap(net.TCPCap(net.NetCap(env.cap))), target, on_connect, on_error, insecure=insecure, log_handler=logh, tls_verify=False, basic_creds=basic_creds)
 
+    #prefix: /openconfig-interfaces:interfaces/interface/state
+    #paths:
+    #  - counters/in-pkts
+    #  - counters/in-errors
+    #  - counters/out-pkts
+    #  - counters/out-errors
+    #mode: STREAM
+    #stream-mode: SAMPLE
+    #sample-interval: 5s
