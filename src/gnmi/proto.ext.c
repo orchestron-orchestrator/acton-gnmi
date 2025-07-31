@@ -56,6 +56,8 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
 
         //various scalar fields
         subscribe_request.subscribe->qos = acton_malloc(sizeof(Gnmi__QOSMarking));
+        gnmi__qosmarking__init(subscribe_request.subscribe->qos);
+        subscribe_request.subscribe->qos->marking = fromB_u32(acton_subscription_list->qos);
         subscribe_request.subscribe->mode = from$int(acton_subscription_list->mode);
         subscribe_request.subscribe->allow_aggregation = fromB_bool(acton_subscription_list->allow_aggregation);
         subscribe_request.subscribe->encoding = from$int(acton_subscription_list->encoding);
