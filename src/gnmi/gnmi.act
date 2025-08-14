@@ -31,19 +31,27 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
 
     channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error, logh, tls_verify)
 
-    def _on_response(channel: grpc.Channel, response: bytes) -> None:
-        print(response)
-
     def capabilities():
+        def _on_response(channel: grpc.Channel, response: bytes) -> None:
+            print(response)
+
         channel.unary_unary('/gnmi.gNMI/Capabilities', b'', _on_response, additional_headers=additional_headers)
 
     def get():
+        def _on_response(channel: grpc.Channel, response: bytes) -> None:
+            print(response)
+
         channel.unary_unary('/gnmi.gNMI/Get', b'', _on_response, additional_headers=additional_headers)
 
     def set():
+        def _on_response(channel: grpc.Channel, response: bytes) -> None:
+            print(response)
+
         channel.unary_unary('/gnmi.gNMI/Set', b'', _on_response, additional_headers=additional_headers)
 
     def subscribe(prefix: proto.Path, paths: list[proto.Path], mode: int, stream_mode: int, sample_interval):
+        def _on_response(channel: grpc.Channel, response: bytes) -> None:
+            print(response)
 
         allow_aggregation = False
         qos = 0
@@ -57,7 +65,7 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
 
         request = proto.SubscribeRequest(proto.SubscriptionList(prefix, subscriptions, qos, mode, allow_aggregation, use_models, encoding, updates_only))
         payload: bytes = request.pack()
-        channel.unary_unary('/gnmi.gNMI/Subscribe', request.pack(), _on_response, additional_headers=additional_headers)
+        channel.stream_stream('/gnmi.gNMI/Subscribe', [request.pack()], _on_response, additional_headers=additional_headers)
 
 
 actor main(env):
