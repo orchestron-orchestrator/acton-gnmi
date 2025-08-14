@@ -1,5 +1,15 @@
 #include "gnmi/gnmi.pb-c.c"
 
+void *acton_malloc_cb(void *mem_user_data, size_t size) {
+    return acton_malloc(size);
+}
+
+void *acton_free_cb(void *mem_user_data, void *ptr) {
+    return acton_free(ptr);
+}
+struct ProtobufCAllocator acton_alloc = { acton_malloc_cb, acton_free_cb, NULL };
+
+
 void gnmiQ_protoQ___ext_init__() {
    // NOP
 }
@@ -113,3 +123,9 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
 
     return ret;
 }
+
+gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes data) {
+
+    Gnmi__SubscribeResponse subscribe_response = gnmi__subscribe_response__unpack(acton_alloc, data.nbytes, data.str);
+}
+
