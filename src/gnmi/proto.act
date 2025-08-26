@@ -151,12 +151,66 @@ class SubscribeRequest:
     def pack(self) -> bytes:
         return pack_SubscribeRequest(self)
 
+VALUE__NOT_SET = 0,
+VALUE_STRING_VAL = 1,
+VALUE_INT_VAL = 2,
+VALUE_UINT_VAL = 3,
+VALUE_BOOL_VAL = 4,
+VALUE_BYTES_VAL = 5,
+VALUE_FLOAT_VAL = 6,
+VALUE_DOUBLE_VAL = 14,
+VALUE_DECIMAL_VAL = 7,
+VALUE_LEAFLIST_VAL = 8,
+VALUE_ANY_VAL = 9,
+VALUE_JSON_VAL = 10,
+VALUE_JSON_IETF_VAL = 11,
+VALUE_ASCII_VAL = 12,
+VALUE_PROTO_BYTES = 13
+
+class TypedValue:
+    value_type: int
+    value: value
+
+    def __init__(self, value_type: int, value_value: value):
+        self.value_type = value_type
+        self.value = value_value
+
+class Update:
+    path: Path
+    val: TypedValue
+    duplicates: u32
+
+    def __init__(self, path: Path, val: TypedValue, duplicates: u32):
+        self.path = path
+        self.val = val
+        self.duplicates = duplicates
+
+class Notification:
+    timestamp: i64
+    prefix: Path
+    update: list[Update]
+    delete: list[Path]
+    atomic: bool
+
+    def __init__(self, timestamp: i64, prefix: Path, update: list[Update], delete: list[Path], atomic: bool):
+        self.timestamp = timestamp
+        self.prefix = prefix
+        self.update = update
+        self.delete = delete
+        self.atomic = atomic
+
 def pack_SubscribeResponse(p: SubscribeResponse) -> bytes:
     return b''
 
 class SubscribeResponse:
-    def __init__(self):
-        pass
+    response_case: int
+    update: ?Update
+    sync_response: bool
+
+    def __init__(self, response_case: int, update: ?Update, sync_response: bool):
+        self.response_case = response_case
+        self.update = update
+        self.sync_response = sync_response
 
     def pack(self) -> bytes:
         return pack_SubscribeResponse(self)
