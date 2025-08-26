@@ -1,13 +1,13 @@
 #include "gnmi/gnmi.pb-c.c"
 
-void *acton_malloc_cb(void *mem_user_data, size_t size) {
+void *gnmi_acton_malloc_cb(void *mem_user_data, size_t size) {
     return acton_malloc(size);
 }
 
-void *acton_free_cb(void *mem_user_data, void *ptr) {
+void gnmi_acton_free_cb(void *mem_user_data, void *ptr) {
     return acton_free(ptr);
 }
-struct ProtobufCAllocator acton_alloc = { acton_malloc_cb, acton_free_cb, NULL };
+struct ProtobufCAllocator gnmi_acton_alloc = { gnmi_acton_malloc_cb, gnmi_acton_free_cb, NULL };
 
 
 void gnmiQ_protoQ___ext_init__() {
@@ -32,7 +32,7 @@ int copy_path_data(Gnmi__Path *proto_path, gnmiQ_protoQ_Path acton_path) {
         size_t n_key = acton_elems[i]->keys->length;
         elem->n_key = n_key;
         elem->key = acton_calloc(n_key, sizeof(Gnmi__PathElem__KeyEntry*));
-        B_tuple *acton_keys = acton_elems[i]->keys->data;
+        B_tuple *acton_keys = (B_tuple*)acton_elems[i]->keys->data;
     
         for (size_t i = 0; i < n_key; ++i) {
             elem->key[i] = acton_malloc(sizeof(Gnmi__PathElem__KeyEntry));
@@ -75,7 +75,7 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
 
         // subscriptions
         size_t n_subscription = acton_subscription_list->subscriptions->length;
-        gnmiQ_protoQ_Subscription *acton_subscriptions = acton_subscription_list->subscriptions->data;
+        gnmiQ_protoQ_Subscription *acton_subscriptions = (gnmiQ_protoQ_Subscription*)acton_subscription_list->subscriptions->data;
         subscribe_request.subscribe->n_subscription = n_subscription;
         Gnmi__Subscription **subscriptions = subscribe_request.subscribe->subscription = acton_calloc(n_subscription, sizeof(Gnmi__Subscription*));
 
@@ -95,7 +95,7 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
 
         // models
         size_t n_use_models = acton_subscription_list->use_models->length;
-        gnmiQ_protoQ_ModelData *acton_use_models = acton_subscription_list->use_models->data;
+        gnmiQ_protoQ_ModelData *acton_use_models = (gnmiQ_protoQ_ModelData*)acton_subscription_list->use_models->data;
         subscribe_request.subscribe->n_use_models = n_use_models;
         Gnmi__ModelData **use_models = subscribe_request.subscribe->use_models = acton_calloc(n_use_models, sizeof(Gnmi__ModelData*));
 
@@ -124,8 +124,31 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
     return ret;
 }
 
+// XXX add routine to convert Gnmi__Path to acton structure
+
 gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes data) {
 
-    Gnmi__SubscribeResponse subscribe_response = gnmi__subscribe_response__unpack(acton_alloc, data.nbytes, data.str);
+    Gnmi__SubscribeResponse *subscribe_response = gnmi__subscribe_response__unpack(&gnmi_acton_alloc, data->nbytes, data->str);
+
+    // skipping extensions for now
+
+    switch (subscribe_response->response_case) {
+        case GNMI__SUBSCRIBE_RESPONSE__RESPONSE__NOT_SET:
+            break;
+        case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_UPDATE:
+	    size_t n_update = subscribe_response->update->n_update;
+            for (size_t i = 0; i < n_update; ++i) {
+                Gnmi__Update *update = subscribe_response->update->update[i];
+	    }
+            size_t n_delete = subscribe_response->update->n_delete_;
+            for (size_t i = 0; i < n_delete; ++i) {
+	    }
+            break;
+        case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_SYNC_RESPONSE:
+            break;
+        case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_ERROR:
+            // deprecated case
+            break;
+    }
 }
 
