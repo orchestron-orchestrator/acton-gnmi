@@ -14,7 +14,7 @@ void gnmiQ_protoQ___ext_init__() {
    // NOP
 }
 
-int copy_path_data(Gnmi__Path *proto_path, gnmiQ_protoQ_Path acton_path) {
+int path_acton_to_proto(Gnmi__Path *proto_path, gnmiQ_protoQ_Path acton_path) {
     proto_path->origin = (char*)fromB_str(acton_path->origin);
     proto_path->target = (char*)fromB_str(acton_path->target);
 
@@ -34,14 +34,41 @@ int copy_path_data(Gnmi__Path *proto_path, gnmiQ_protoQ_Path acton_path) {
         elem->key = acton_calloc(n_key, sizeof(Gnmi__PathElem__KeyEntry*));
         B_tuple *acton_keys = (B_tuple*)acton_elems[i]->keys->data;
     
-        for (size_t i = 0; i < n_key; ++i) {
-            elem->key[i] = acton_malloc(sizeof(Gnmi__PathElem__KeyEntry));
-            gnmi__path_elem__key_entry__init(elem->key[i]);
-            elem->key[i]->key = (char*)fromB_str(acton_keys[i]->components[0]);
-            elem->key[i]->value = (char*)fromB_str(acton_keys[i]->components[1]);
+        for (size_t j = 0; j < n_key; ++j) {
+            elem->key[j] = acton_malloc(sizeof(Gnmi__PathElem__KeyEntry));
+            gnmi__path_elem__key_entry__init(elem->key[j]);
+            elem->key[j]->key = (char*)fromB_str(acton_keys[j]->components[0]);
+            elem->key[j]->value = (char*)fromB_str(acton_keys[j]->components[1]);
         }
     }
     return 0;
+}
+
+gnmiQ_protoQ_Path path_proto_to_acton(Gnmi__Path *proto_path) {
+    size_t n_elem = proto_path->n_elem;
+    B_list elems = B_listD_new(n_elem);
+    B_Sequence elem_wit = (B_Sequence)B_SequenceD_listG_witness;
+
+    for (size_t i = 0; i < n_elem; ++i) {
+        size_t n_key = proto_path->elem[i]->n_key;
+        B_list keys = B_listD_new(n_key);
+        B_Sequence key_wit = (B_Sequence)B_SequenceD_listG_witness;
+
+        for (size_t j = 0; j < n_key; ++j) {
+            char *key = proto_path->elem[i]->key[j]->key;
+            char *value = proto_path->elem[i]->key[j]->value;
+            B_tuple pair = $NEWTUPLE(2, to$str(key), to$str(value));
+            key_wit->$class->append(key_wit, keys, pair);
+        }
+        elem_wit->$class->append(elem_wit, elems, gnmiQ_protoQ_PathElemG_new(to$str(proto_path->elem[i]->name), keys));
+    }
+
+    B_str origin = to$str(proto_path->origin);
+    B_str target = to$str(proto_path->target);
+
+    gnmiQ_protoQ_Path acton_path = gnmiQ_protoQ_PathG_new(elems, origin, target);
+
+    return acton_path;
 }
 
 B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_subscribe_request) {
@@ -62,7 +89,7 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
         // set prefix path
         subscribe_request.subscribe->prefix = acton_malloc(sizeof(Gnmi__Path));
         gnmi__path__init(subscribe_request.subscribe->prefix);
-        copy_path_data(subscribe_request.subscribe->prefix, acton_subscription_list->prefix);
+        path_acton_to_proto(subscribe_request.subscribe->prefix, acton_subscription_list->prefix);
 
         //various scalar fields
         subscribe_request.subscribe->qos = acton_malloc(sizeof(Gnmi__QOSMarking));
@@ -85,7 +112,7 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
 
             subscriptions[i]->path = acton_malloc(sizeof(Gnmi__Path));
             gnmi__path__init(subscriptions[i]->path);
-            copy_path_data(subscriptions[i]->path, acton_subscriptions[i]->path);
+            path_acton_to_proto(subscriptions[i]->path, acton_subscriptions[i]->path);
 
             subscriptions[i]->mode = from$int(acton_subscriptions[i]->mode);
             subscriptions[i]->sample_interval = fromB_u64(acton_subscriptions[i]->sample_interval);
