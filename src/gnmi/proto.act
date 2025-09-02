@@ -24,6 +24,13 @@ class PathElem:
         self.name = name
         self.keys = keys
 
+    def __str__(self):
+        formatted_keys = ''
+        for pair in self.keys:
+            key, val = pair
+            formatted_keys += f'[{key}={val}]'
+        return f'/{self.name}{formatted_keys}'
+
 class Path:
     elems: list[PathElem]
     origin: str
@@ -33,6 +40,13 @@ class Path:
         self.elems = elems
         self.origin = origin
         self.target = target
+
+    def __str__(self):
+        xpath = ''
+        for elem in self.elems:
+            xpath += str(elem)
+
+        return f'Path({xpath}, origin={self.origin}, target={self.target})'
 
 class ModelData:
     name: str
@@ -175,6 +189,9 @@ class TypedValue:
         self.value_type = value_type
         self.value = value_value
 
+    def __str__(self):
+        return 'TypedVal(' + str(self.value_type) + ')'
+
 class Update:
     path: Path
     val: TypedValue
@@ -184,6 +201,9 @@ class Update:
         self.path = path
         self.val = val
         self.duplicates = duplicates
+
+    def __str__(self):
+        return f'Update({self.path}, {self.val}, {self.duplicates})'
 
 class Notification:
     timestamp: i64
@@ -198,6 +218,17 @@ class Notification:
         self.update = update
         self.delete = delete
         self.atomic = atomic
+
+    def __str__(self):
+        updates_str = '['
+        last = len(self.update) - 1
+        for i, update in enumerate(self.update):
+            updates_str += str(update)
+            if i != last:
+                updates_str += ', '
+        updates_str += ']'
+
+        return f'Notification({self.timestamp}, {self.prefix}, {updates_str}, {self.delete}, {self.atomic})'
 
 def pack_SubscribeResponse(p: SubscribeResponse) -> bytes:
     return b''
@@ -214,6 +245,9 @@ class SubscribeResponse:
         self.response_case = response_case
         self.update = update
         self.sync_response = sync_response
+
+    def __str__(self):
+        return f'SubscribeResponse({self.response_case}, {self.update}, {self.sync_response})'
 
     def pack(self) -> bytes:
         return pack_SubscribeResponse(self)
