@@ -202,12 +202,15 @@ class Notification:
 def pack_SubscribeResponse(p: SubscribeResponse) -> bytes:
     return b''
 
+def unpack_SubscribeResponse(b: bytes) -> SubscribeResponse:
+    NotImplemented
+
 class SubscribeResponse:
     response_case: int
-    update: ?Update
+    update: ?Notification
     sync_response: bool
 
-    def __init__(self, response_case: int, update: ?Update, sync_response: bool):
+    def __init__(self, response_case: int, update: ?Notification, sync_response: bool):
         self.response_case = response_case
         self.update = update
         self.sync_response = sync_response

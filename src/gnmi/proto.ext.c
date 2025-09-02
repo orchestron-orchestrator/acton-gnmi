@@ -151,11 +151,12 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
     return ret;
 }
 
-// XXX add routine to convert Gnmi__Path to acton structure
-
 gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes data) {
 
     Gnmi__SubscribeResponse *subscribe_response = gnmi__subscribe_response__unpack(&gnmi_acton_alloc, data->nbytes, data->str);
+
+    gnmiQ_protoQ_Notification acton_notif = NULL;
+    B_bool sync_response = toB_bool(false);
 
     // skipping extensions for now
 
@@ -163,13 +164,69 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
         case GNMI__SUBSCRIBE_RESPONSE__RESPONSE__NOT_SET:
             break;
         case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_UPDATE:
-	    size_t n_update = subscribe_response->update->n_update;
+            Gnmi__Notification *proto_notif = subscribe_response->update;
+
+            B_i64 timestamp = toB_i64(proto_notif->timestamp);
+            gnmiQ_protoQ_Path prefix = path_proto_to_acton(proto_notif->prefix);
+            B_bool atomic = toB_bool(proto_notif->atomic);
+
+	    size_t n_update = proto_notif->n_update;
+            B_list updates = B_listD_new(n_update);
+            B_Sequence update_wit = (B_Sequence)B_SequenceD_listG_witness;
             for (size_t i = 0; i < n_update; ++i) {
-                Gnmi__Update *update = subscribe_response->update->update[i];
+                Gnmi__Update *proto_update = proto_notif->update[i];
+                gnmiQ_protoQ_Path update_path = path_proto_to_acton(proto_update->path);
+                B_value val;
+                switch(proto_update->val->value_case) {
+                    GNMI__TYPED_VALUE__VALUE__NOT_SET:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_STRING_VAL:
+                        val = (B_value)to$str(proto_update->val->string_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_INT_VAL:
+                        val = (B_value)toB_i64(proto_update->val->int_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_UINT_VAL:
+                        val = (B_value)toB_u64(proto_update->val->uint_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_BOOL_VAL:
+                        val = (B_value)toB_bool(proto_update->val->bool_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_BYTES_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_FLOAT_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_DOUBLE_VAL:
+                        val = (B_value)toB_float(proto_update->val->double_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_LEAFLIST_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_ANY_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_JSON_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_JSON_IETF_VAL:
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_ASCII_VAL:
+                        val = (B_value)to$str(proto_update->val->ascii_val);
+                        break;
+                    GNMI__TYPED_VALUE__VALUE_PROTO_BYTES:
+                        break;
+                }
+                gnmiQ_protoQ_TypedValue typed_val = gnmiQ_protoQ_TypedValueG_new(to$int(proto_update->val->value_case), val);
+                gnmiQ_protoQ_Update acton_update = gnmiQ_protoQ_UpdateG_new(prefix, typed_val, toB_u32(proto_update->duplicates));
+                update_wit->$class->append(update_wit, updates, acton_update);
 	    }
-            size_t n_delete = subscribe_response->update->n_delete_;
+
+            size_t n_delete = proto_notif->n_delete_;
+            B_list deletes = B_listD_new(n_delete);
+            B_Sequence delete_wit = (B_Sequence)B_SequenceD_listG_witness;
             for (size_t i = 0; i < n_delete; ++i) {
 	    }
+
+            acton_notif = gnmiQ_protoQ_NotificationG_new(timestamp, prefix, updates, deletes, atomic);
             break;
         case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_SYNC_RESPONSE:
             break;
@@ -177,5 +234,8 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
             // deprecated case
             break;
     }
+    gnmiQ_protoQ_SubscribeResponse response = gnmiQ_protoQ_SubscribeResponseG_new(to$int(subscribe_response->response_case), acton_notif, sync_response);
+
+    return response;
 }
 
