@@ -2,8 +2,8 @@
     "dependencies": {
         "grpc": {
             "repo_url": "https://github.com/actonlang/acton-grpc.git",
-            "url": "https://github.com/actonlang/acton-grpc/archive/83eb5581c08a5acafd73ba40b20623c85adc4808.zip",
-            "hash": "1220078186340054c66ebc4ce32da1c5c48e33645c99b642c280b403c774da91e14f"
+            "url": "https://github.com/actonlang/acton-grpc/archive/a2d4f36961d2227827c619993eed8fd6cd7a7ea3.zip",
+            "hash": "1220ee39057b070592faa828d21d0ab1d65431830760de0dc7bf5197b8898f7dcbad"
         }
     },
     "zig_dependencies": {}
