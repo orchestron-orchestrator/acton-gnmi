@@ -177,42 +177,43 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
                 Gnmi__Update *proto_update = proto_notif->update[i];
                 gnmiQ_protoQ_Path update_path = path_proto_to_acton(proto_update->path);
                 B_value val;
+
                 switch(proto_update->val->value_case) {
-                    GNMI__TYPED_VALUE__VALUE__NOT_SET:
+                    case GNMI__TYPED_VALUE__VALUE__NOT_SET:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_STRING_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_STRING_VAL:
                         val = (B_value)to$str(proto_update->val->string_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_INT_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_INT_VAL:
                         val = (B_value)toB_i64(proto_update->val->int_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_UINT_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_UINT_VAL:
                         val = (B_value)toB_u64(proto_update->val->uint_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_BOOL_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_BOOL_VAL:
                         val = (B_value)toB_bool(proto_update->val->bool_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_BYTES_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_BYTES_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_FLOAT_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_FLOAT_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_DOUBLE_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_DOUBLE_VAL:
                         val = (B_value)toB_float(proto_update->val->double_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_LEAFLIST_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_LEAFLIST_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_ANY_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_ANY_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_JSON_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_JSON_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_JSON_IETF_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_JSON_IETF_VAL:
                         break;
-                    GNMI__TYPED_VALUE__VALUE_ASCII_VAL:
+                    case GNMI__TYPED_VALUE__VALUE_ASCII_VAL:
                         val = (B_value)to$str(proto_update->val->ascii_val);
                         break;
-                    GNMI__TYPED_VALUE__VALUE_PROTO_BYTES:
+                    case GNMI__TYPED_VALUE__VALUE_PROTO_BYTES:
                         break;
                 }
                 gnmiQ_protoQ_TypedValue typed_val = gnmiQ_protoQ_TypedValueG_new(to$int(proto_update->val->value_case), val);

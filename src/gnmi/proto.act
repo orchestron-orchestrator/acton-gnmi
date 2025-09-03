@@ -190,7 +190,7 @@ class TypedValue:
         self.value = value_value
 
     def __str__(self):
-        return 'TypedVal(' + str(self.value_type) + ')'
+        return f'TypedVal({self.value_type}, {self.value})'
 
 class Update:
     path: Path
