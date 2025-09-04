@@ -217,7 +217,7 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
                         break;
                 }
                 gnmiQ_protoQ_TypedValue typed_val = gnmiQ_protoQ_TypedValueG_new(to$int(proto_update->val->value_case), val);
-                gnmiQ_protoQ_Update acton_update = gnmiQ_protoQ_UpdateG_new(prefix, typed_val, toB_u32(proto_update->duplicates));
+                gnmiQ_protoQ_Update acton_update = gnmiQ_protoQ_UpdateG_new(update_path, typed_val, toB_u32(proto_update->duplicates));
                 update_wit->$class->append(update_wit, updates, acton_update);
 	    }
 
