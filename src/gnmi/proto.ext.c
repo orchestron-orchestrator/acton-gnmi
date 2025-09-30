@@ -176,29 +176,42 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
             for (size_t i = 0; i < n_update; ++i) {
                 Gnmi__Update *proto_update = proto_notif->update[i];
                 gnmiQ_protoQ_Path update_path = path_proto_to_acton(proto_update->path);
-                B_value val;
+
+                gnmiQ_protoQ_TypedValue typed_val;
+                ProtobufCBinaryData bytes_val;
+                B_bytes acton_bytes_val;
+                B_str string_val;
 
                 switch(proto_update->val->value_case) {
                     case GNMI__TYPED_VALUE__VALUE__NOT_SET:
                         break;
                     case GNMI__TYPED_VALUE__VALUE_STRING_VAL:
-                        val = (B_value)to$str(proto_update->val->string_val);
+                        B_str b_str_val = to$str(proto_update->val->string_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_StringValueG_new(b_str_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_INT_VAL:
-                        val = (B_value)toB_i64(proto_update->val->int_val);
+                        B_i64 b_i64_val = toB_i64(proto_update->val->int_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_IntValueG_new(b_i64_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_UINT_VAL:
-                        val = (B_value)toB_u64(proto_update->val->uint_val);
+                        B_u64 b_u64_val = toB_u64(proto_update->val->uint_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_UIntValueG_new(b_u64_val);
+                        break;
                         break;
                     case GNMI__TYPED_VALUE__VALUE_BOOL_VAL:
-                        val = (B_value)toB_bool(proto_update->val->bool_val);
+                        B_bool b_bool_val = toB_bool(proto_update->val->bool_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_BoolValueG_new(b_bool_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_BYTES_VAL:
+                        bytes_val = proto_update->val->bytes_val;
+                        B_bytes b_bytes_val = to$bytesD_len((char*)bytes_val.data, bytes_val.len);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_BytesValueG_new(b_bytes_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_FLOAT_VAL:
                         break;
                     case GNMI__TYPED_VALUE__VALUE_DOUBLE_VAL:
-                        val = (B_value)toB_float(proto_update->val->double_val);
+                        B_float b_float_val = toB_float(proto_update->val->double_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_DoubleValueG_new(b_float_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
                         break;
@@ -207,16 +220,29 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
                     case GNMI__TYPED_VALUE__VALUE_ANY_VAL:
                         break;
                     case GNMI__TYPED_VALUE__VALUE_JSON_VAL:
+                        bytes_val = proto_update->val->json_val;
+                        acton_bytes_val = to$bytesD_len((char*)bytes_val.data, bytes_val.len);
+                        string_val = to$str((char*)acton_bytes_val->str);
+                        B_dict json_val = jsonQ_decode(string_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_JsonValueG_new(json_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_JSON_IETF_VAL:
+                        bytes_val = proto_update->val->json_ietf_val;
+                        acton_bytes_val = to$bytesD_len((char*)bytes_val.data, bytes_val.len);
+                        string_val = to$str((char*)acton_bytes_val->str);
+                        B_dict json_ietf_val = jsonQ_decode(string_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_JsonIetfValueG_new(json_ietf_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_ASCII_VAL:
-                        val = (B_value)to$str(proto_update->val->ascii_val);
+                        B_str ascii_val = to$str(proto_update->val->ascii_val);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_AsciiValueG_new(ascii_val);
                         break;
                     case GNMI__TYPED_VALUE__VALUE_PROTO_BYTES:
+                        bytes_val = proto_update->val->proto_bytes;
+                        B_bytes proto_val = to$bytesD_len((char*)bytes_val.data, bytes_val.len);
+                        typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_ProtoBytesValueG_new(proto_val);
                         break;
                 }
-                gnmiQ_protoQ_TypedValue typed_val = gnmiQ_protoQ_TypedValueG_new(to$int(proto_update->val->value_case), val);
                 gnmiQ_protoQ_Update acton_update = gnmiQ_protoQ_UpdateG_new(update_path, typed_val, toB_u32(proto_update->duplicates));
                 update_wit->$class->append(update_wit, updates, acton_update);
 	    }

@@ -1,3 +1,4 @@
+import json
 #Encodings
 JSON = 0
 BYTES = 1
@@ -182,15 +183,132 @@ VALUE_ASCII_VAL = 12,
 VALUE_PROTO_BYTES = 13
 
 class TypedValue:
-    value_type: int
-    value: value
+    #value: value
 
-    def __init__(self, value_type: int, value_value: value):
-        self.value_type = value_type
-        self.value = value_value
+    #def __init__(self, value_value: value):
+        #pass
+        #self.value_type = value_type
+        #self.value = value_value
 
     def __str__(self):
-        return f'TypedVal({self.value_type}, {self.value})'
+        #return f'TypedValue({self.value})'
+        return f'TypedValue'
+
+class StringValue(TypedValue):
+    value: str
+
+    def __init__(self, val: str):
+        self.value = val
+
+    def __str__(self):
+        return f'StringValue(\'{self.value}\')'
+
+class IntValue(TypedValue):
+    value: i64
+
+    def __init__(self, val: i64):
+        self.value = val
+
+    def __str__(self):
+        return f'IntValue({self.value})'
+
+class UIntValue(TypedValue):
+    value: u64
+
+    def __init__(self, val: u64):
+        self.value = val
+
+    def __str__(self):
+        return f'UintValue({self.value})'
+
+class BoolValue(TypedValue):
+    value: bool
+
+    def __init__(self, val: bool):
+        self.value = val
+
+    def __str__(self):
+        return f'BoolValue({self.value})'
+
+class BytesValue(TypedValue):
+    value: bytes
+
+    def __init__(self, val: bytes):
+        self.value = val
+
+    def __str__(self):
+        return f'BytesValue({self.value})'
+
+class DoubleValue(TypedValue):
+    value: float
+
+    def __init__(self, val: float):
+        self.value = val
+
+    def __str__(self):
+        return f'DoubleValue({self.value})'
+
+VALUE_LEAFLIST_VAL = 8,
+class LeafLiftValue(TypedValue):
+    value: list[TypedValue]
+
+    def __init__(self, val: list[TypedValue]):
+        self.value = val
+
+    def __str__(self):
+        return f'LeafLiftValue({self.value})'
+
+VALUE_ANY_VAL = 9,
+class AnyValue(TypedValue):
+    value: bytes
+    type_url: str
+
+    def __init__(self, val: bytes, type_url: str):
+        self.value = val
+        self.type_url = type_url
+
+    def __str__(self):
+        return f'AnyValue({self.value})'
+
+VALUE_JSON_VAL = 10,
+class JsonValue(TypedValue):
+    value: dict[str, value]
+
+    def __init__(self, val: dict[str, value]):
+        self.value = val
+
+    def __str__(self):
+        return f'JsonValue({self.value})'
+
+VALUE_JSON_IETF_VAL = 11,
+class JsonIetfValue(TypedValue):
+    value: dict[str, value]
+
+    def __init__(self, val: dict[str, value]):
+        self.value = val
+
+    def __str__(self):
+        return f'JsonIetfValue({self.value})'
+
+VALUE_ASCII_VAL = 12,
+class AsciiValue(TypedValue):
+    value: str
+
+    def __init__(self, val: str):
+        self.value = val
+
+    def __str__(self):
+        return f'AsciiValue({self.value})'
+
+VALUE_PROTO_BYTES = 13
+class ProtoBytesValue(TypedValue):
+    value: bytes
+
+    def __init__(self, val: bytes):
+        self.value = val
+
+    def __str__(self):
+        return f'ProtoBytesValue({self.value})'
 
 class Update:
     path: Path
