@@ -249,7 +249,7 @@ class DoubleValue(TypedValue):
         return f'DoubleValue({self.value})'
 
 VALUE_LEAFLIST_VAL = 8,
-class LeafLiftValue(TypedValue):
+class LeafListValue(TypedValue):
     value: list[TypedValue]
 
     def __init__(self, val: list[TypedValue]):

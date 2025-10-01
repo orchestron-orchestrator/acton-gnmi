@@ -191,6 +191,16 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
         case GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
             break;
         case GNMI__TYPED_VALUE__VALUE_LEAFLIST_VAL:
+            size_t n_element = val->leaflist_val->n_element;
+            B_list list_val = B_listD_new(n_element);
+
+            B_Sequence leaflist_wit = (B_Sequence)B_SequenceD_listG_witness;
+            for (size_t i = 0; i < n_element; ++i) {
+                Gnmi__TypedValue *leaf_val = val->leaflist_val->element[i];
+                gnmiQ_protoQ_TypedValue leaf_typed_val = typed_val_proto_to_acton(leaf_val);
+                leaflist_wit->$class->append(leaflist_wit, list_val, leaf_typed_val);
+            }
+            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_LeafListValueG_new(list_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_ANY_VAL:
             break;
