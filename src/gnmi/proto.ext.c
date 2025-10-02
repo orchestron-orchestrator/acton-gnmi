@@ -159,6 +159,7 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
 
     switch(val->value_case) {
         case GNMI__TYPED_VALUE__VALUE__NOT_SET:
+            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_NotSetValueG_new();
             break;
         case GNMI__TYPED_VALUE__VALUE_STRING_VAL:
             B_str b_str_val = to$str(val->string_val);

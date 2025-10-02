@@ -192,7 +192,14 @@ class TypedValue:
 
     def __str__(self):
         #return f'TypedValue({self.value})'
-        return f'TypedValue'
+        return f'TypedValue()'
+
+class NotSetValue(TypedValue):
+     def __init__(self):
+         pass
+
+     def __str__(self):
+         return f'NotSetValue()'
 
 class StringValue(TypedValue):
     value: str
