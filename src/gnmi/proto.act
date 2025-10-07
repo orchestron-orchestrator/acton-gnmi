@@ -16,6 +16,17 @@ STREAM = 0
 ONCE = 1
 POLL = 2
 
+class Any:
+    type_url: str
+    value: bytes
+
+    def __init__(self, type_url: str, val: bytes):
+        self.type_url = type_url
+        self.value = val
+
+    def __str__(self):
+        return f'Any({self.type_url}, {self.value})'
+    
 
 class PathElem:
     name: str
@@ -267,12 +278,10 @@ class LeafListValue(TypedValue):
 
 VALUE_ANY_VAL = 9,
 class AnyValue(TypedValue):
-    value: bytes
-    type_url: str
+    value: Any
 
-    def __init__(self, val: bytes, type_url: str):
+    def __init__(self, val: Any):
         self.value = val
-        self.type_url = type_url
 
     def __str__(self):
         return f'AnyValue({self.value})'

@@ -207,7 +207,8 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             B_str type_url = to$str(val->any_val->type_url);
             bytes_val = val->any_val->value;
             acton_bytes_val = to$bytesD_len((char*)bytes_val.data, bytes_val.len);
-            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_AnyValueG_new(acton_bytes_val, type_url);
+            gnmiQ_protoQ_Any any_val = gnmiQ_protoQ_AnyG_new(type_url, acton_bytes_val);
+            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_AnyValueG_new(any_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_JSON_VAL:
             bytes_val = val->json_val;
