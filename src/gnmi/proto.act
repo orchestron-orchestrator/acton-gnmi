@@ -263,7 +263,7 @@ class LeafListValue(TypedValue):
         self.value = val
 
     def __str__(self):
-        return f'LeafLiftValue({self.value})'
+        return f'LeafListValue({self.value})'
 
 VALUE_ANY_VAL = 9,
 class AnyValue(TypedValue):
