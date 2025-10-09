@@ -198,6 +198,8 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_BytesValueG_new(b_bytes_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_FLOAT_VAL:
+            b_float_val = toB_float(val->double_val);
+            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_FloatValueG_new(b_float_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_DOUBLE_VAL:
             b_float_val = toB_float(val->double_val);

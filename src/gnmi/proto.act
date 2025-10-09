@@ -257,6 +257,15 @@ class BytesValue(TypedValue):
     def __str__(self):
         return f'BytesValue({self.value})'
 
+class FloatValue(TypedValue):
+    value: float
+
+    def __init__(self, val: float):
+        self.value = val
+
+    def __str__(self):
+        return f'FloatValue({self.value})'
+
 class DoubleValue(TypedValue):
     value: float
 
