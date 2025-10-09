@@ -27,6 +27,18 @@ class Any:
     def __str__(self):
         return f'Any({self.type_url}, {self.value})'
     
+class Decimal64:
+    digits: i64
+    precision: u32
+
+    def __init__(self, digits: i64, precision: u32):
+        self.digits = digits
+        self.precision = precision
+
+    def __str__(self):
+        integer_digits = self.digits // (10**i64(self.precision))
+        decimal_digits = self.digits % (10**i64(self.precision))
+        return f'Decimal64({integer_digits}.{decimal_digits})'
 
 class PathElem:
     name: str
@@ -275,7 +287,15 @@ class DoubleValue(TypedValue):
     def __str__(self):
         return f'DoubleValue({self.value})'
 
-VALUE_LEAFLIST_VAL = 8,
+class DecimalValue(TypedValue):
+    value: Decimal64
+
+    def __init__(self, val: Decimal64):
+        self.value = val
+
+    def __str__(self):
+        return f'DecimalValue({self.value})'
+
 class LeafListValue(TypedValue):
     value: list[TypedValue]
 

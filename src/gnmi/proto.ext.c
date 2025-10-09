@@ -162,6 +162,8 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
     B_bool b_bool_val;
     B_str string_val;
     B_float b_float_val;
+    B_u32 b_u32_val;
+    gnmiQ_protoQ_Decimal64 decimal_val;
     size_t n_element;
     B_list list_val;
     B_Sequence leaflist_wit;
@@ -206,6 +208,10 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_DoubleValueG_new(b_float_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
+            b_i64_val = toB_i64(val->decimal_val->digits);
+            b_u32_val = toB_u32(val->decimal_val->precision);
+            decimal_val = gnmiQ_protoQ_Decimal64G_new(b_i64_val, b_u32_val);
+            typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_DecimalValueG_new(decimal_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_LEAFLIST_VAL:
             n_element = val->leaflist_val->n_element;
@@ -241,7 +247,7 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_JsonIetfValueG_new(json_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_ASCII_VAL:
-            B_str ascii_val = to$str(val->ascii_val);
+            ascii_val = to$str(val->ascii_val);
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_AsciiValueG_new(ascii_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_PROTO_BYTES:
