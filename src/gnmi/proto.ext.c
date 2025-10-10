@@ -294,6 +294,8 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
             B_list deletes = B_listD_new(n_delete);
             B_Sequence delete_wit = (B_Sequence)B_SequenceD_listG_witness;
             for (size_t i = 0; i < n_delete; ++i) {
+                gnmiQ_protoQ_Path acton_delete = path_proto_to_acton(proto_notif->delete_);
+                delete_wit->$class->append(delete_wit, deletes, acton_delete);
 	    }
 
             acton_notif = gnmiQ_protoQ_NotificationG_new(timestamp, prefix, updates, deletes, atomic);
