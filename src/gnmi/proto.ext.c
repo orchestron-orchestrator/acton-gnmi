@@ -71,6 +71,31 @@ gnmiQ_protoQ_Path path_proto_to_acton(Gnmi__Path *proto_path) {
     return acton_path;
 }
 
+gnmiQ_protoQ_CapabilityResponse gnmiQ_protoQ_unpack_CapabilityResponse(B_bytes data) {
+    Gnmi__CapabilityResponse *proto_capability_response = gnmi__capability_response__unpack(&gnmi_acton_alloc, data->nbytes, data->str);
+
+    size_t n_supported_models = proto_capability_response->n_supported_models;
+    B_list supported_models = B_listD_new(n_supported_models);
+    B_Sequence supported_models_wit = (B_Sequence)B_SequenceD_listG_witness;
+    for (size_t i = 0; i < n_supported_models; ++i) {
+        gnmiQ_protoQ_ModelData model;
+        supported_models_wit->$class->append(supported_models_wit, supported_models, model);
+    }
+
+    size_t n_supported_encodings = proto_capability_response->n_supported_encodings;
+    B_list supported_encodings = B_listD_new(n_supported_encodings);
+    B_Sequence supported_encodings_wit = (B_Sequence)B_SequenceD_listG_witness;
+    for (size_t i = 0; i < n_supported_encodings; ++i) {
+        B_int encoding = to$int(proto_capability_response->supported_encodings[i]);
+        supported_encodings_wit->$class->append(supported_encodings_wit, supported_encodings, encoding);
+    }
+
+    B_str gnmi_version = to$str(proto_capability_response->gnmi_version);
+
+    gnmiQ_protoQ_CapabilityResponse capability_response = gnmiQ_protoQ_CapabilityResponseG_new(supported_models, supported_encodings, gnmi_version);
+    return capability_response;
+}
+
 B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_subscribe_request) {
     Gnmi__SubscribeRequest subscribe_request;
 

@@ -95,9 +95,18 @@ class CapabilityRequest:
 def pack_CapabilityResponse(p: CapabilityResponse) -> bytes:
     return b''
 
+def unpack_CapabilityResponse(data: bytes) -> CapabilityResponse:
+    NotImplemented
+
 class CapabilityResponse:
-    def __init__(self):
-        pass
+    supported_models: list[ModelData]
+    supported_encodings: list[int]
+    gnmi_version: str
+
+    def __init__(self, supported_models: list[ModelData], supported_encodings: list[int], gnmi_version: str):
+        self.supported_models = supported_models
+        self.supported_encodings = supported_encodings
+        self.gnmi_version = gnmi_version
 
     def pack(self) -> bytes:
         return pack_CapabilityResponse(self)
