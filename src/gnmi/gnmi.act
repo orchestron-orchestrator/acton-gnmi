@@ -31,28 +31,32 @@ actor Client(cap: net.TCPConnectCap, target: str, on_connect: action(Client) -> 
 
     channel = grpc.Channel(cap, target, [], creds, None, _on_connect, _on_error, logh, tls_verify)
 
-    def capabilities():
+    def capabilities(on_response: action(proto.CapabilityResponse) -> None):
         def _on_response(channel: grpc.Channel, response: bytes) -> None:
-            print(response)
+            logger.debug('Received raw gRPC message', {'message': response})
+            decoded_response: proto.CapabilityResponse = proto.unpack_CapabilityResponse(response)
+            on_response(decoded_response)
 
         channel.unary_unary('/gnmi.gNMI/Capabilities', b'', _on_response, additional_headers=additional_headers)
 
     def get():
         def _on_response(channel: grpc.Channel, response: bytes) -> None:
-            print(response)
+            logger.debug('Received raw gRPC message', {'message': response})
 
         channel.unary_unary('/gnmi.gNMI/Get', b'', _on_response, additional_headers=additional_headers)
 
     def set():
         def _on_response(channel: grpc.Channel, response: bytes) -> None:
-            print(response)
+            logger.debug('Received raw gRPC message', {'message': response})
 
         channel.unary_unary('/gnmi.gNMI/Set', b'', _on_response, additional_headers=additional_headers)
 
-    def subscribe(prefix: proto.Path, paths: list[proto.Path], mode: int, stream_mode: int, sample_interval):
+    def subscribe(on_response: action(proto.SubscribeResponse) -> None, prefix: proto.Path, paths: list[proto.Path], mode: int, stream_mode: int, sample_interval):
         def _on_response(channel: grpc.Channel, response: bytes) -> None:
+            logger.debug('Received raw gRPC message', {'message': response})
+
             decoded_response: proto.SubscribeResponse = proto.unpack_SubscribeResponse(response)
-            print(decoded_response)
+            on_response(decoded_response)
 
         allow_aggregation = False
         qos = 0
@@ -73,7 +77,7 @@ actor main(env):
 
     logh = logging.Handler("gnmi.main")
     logh.add_sink(logging.ConsoleSink())
-    logh.set_output_level(logging.DEBUG)
+    logh.set_output_level(logging.TRACE)
 
     target = env.argv[1]
     insecure = False
@@ -90,8 +94,13 @@ actor main(env):
         print("Client connected", target)
         #c.get()
         #c.set()
-        #c.capabilities()
-        c.subscribe(proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('counters', []), proto.PathElem('in-pkts', [])]), proto.Path([proto.PathElem('counters', []), proto.PathElem('out-pkts', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
+        def _on_capability_response(response: proto.CapabilityResponse):
+            print(response)
+        def _on_subscribe_response(response: proto.SubscribeResponse):
+            print(response)
+        #c.capabilities(_on_capability_response)
+        c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('counters', []), proto.PathElem('in-pkts', [])]), proto.Path([proto.PathElem('counters', []), proto.PathElem('out-pkts', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
+        #c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('asdvhliuhdv', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
     def on_error(c: Client, e: str):
         print("Error:", e)
 
