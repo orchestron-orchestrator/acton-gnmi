@@ -112,11 +112,21 @@ class CapabilityResponse:
         return pack_CapabilityResponse(self)
 
 def pack_GetRequest(p: GetRequest) -> bytes:
-    return b''
+    NotImplemented
 
 class GetRequest:
-    def __init__(self):
-        pass
+    prefix: Path
+    path: list[Path]
+    type: int
+    encoding: int
+    use_models: list[ModelData]
+
+    def __init__(self, prefix: Path, path: list[Path], type: int, encoding: int, use_models: list[ModelData]):
+        self.prefix = prefix
+        self.path = path
+        self.type = type
+        self.encoding = encoding
+        self.use_models = use_models
 
     def pack(self) -> bytes:
         return pack_GetRequest(self)

@@ -96,6 +96,50 @@ gnmiQ_protoQ_CapabilityResponse gnmiQ_protoQ_unpack_CapabilityResponse(B_bytes d
     return capability_response;
 }
 
+B_bytes gnmiQ_protoQ_pack_GetRequest(gnmiQ_protoQ_GetRequest acton_get_request) {
+    Gnmi__GetRequest get_request;
+
+    gnmi__get_request__init(&get_request);
+
+    // no extension support for now
+    get_request.n_extension = 0;
+
+    path_acton_to_proto(&get_request.prefix, &acton_get_request->prefix);
+
+    size_t n_path = acton_get_request->path->length;
+    get_request.path = acton_calloc(n_path, sizeof(Gnmi__Path*));
+    for(size_t i = 0; i < n_path; ++i) {
+        get_request.path[i] = acton_malloc(sizeof(Gnmi__Path));
+        path_acton_to_proto(&get_request.path[i], &acton_get_request->path[i]);
+    }
+
+    size_t n_use_models = acton_get_request->use_models->length;
+    gnmiQ_protoQ_ModelData *acton_use_models = (gnmiQ_protoQ_ModelData*)acton_get_request->use_models->data;
+    get_request.n_use_models = n_use_models;
+    Gnmi__ModelData **use_models = get_request.use_models = acton_calloc(n_use_models, sizeof(Gnmi__ModelData*));
+
+    for (size_t i = 0; i < n_use_models; ++i) {
+        use_models[i] = acton_malloc(sizeof(Gnmi__ModelData));
+        gnmi__model_data__init(use_models[i]);
+
+        use_models[i]->name = (char*)fromB_str(acton_use_models[i]->name);
+        use_models[i]->organization = (char*)fromB_str(acton_use_models[i]->organization);
+        use_models[i]->version = (char*)fromB_str(acton_use_models[i]->version);
+    }
+
+    get_request.type = from$int(acton_get_request->type);
+    get_request.encoding = from$int(acton_get_request->encoding);
+
+    size_t buffer_size = gnmi__get_request__get_packed_size(&get_request);
+
+    uint8_t *buffer = acton_malloc(buffer_size);
+    gnmi__get_request__pack(&get_request, buffer);
+
+    B_bytes ret = to$bytesD_len((char*)buffer, buffer_size);
+
+    return ret;
+}
+
 B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_subscribe_request) {
     Gnmi__SubscribeRequest subscribe_request;
 
