@@ -75,10 +75,14 @@ gnmiQ_protoQ_CapabilityResponse gnmiQ_protoQ_unpack_CapabilityResponse(B_bytes d
     Gnmi__CapabilityResponse *proto_capability_response = gnmi__capability_response__unpack(&gnmi_acton_alloc, data->nbytes, data->str);
 
     size_t n_supported_models = proto_capability_response->n_supported_models;
+    Gnmi__ModelData **proto_supported_models = proto_capability_response->supported_models;
     B_list supported_models = B_listD_new(n_supported_models);
     B_Sequence supported_models_wit = (B_Sequence)B_SequenceD_listG_witness;
     for (size_t i = 0; i < n_supported_models; ++i) {
-        gnmiQ_protoQ_ModelData model;
+        B_str name = to$str(proto_supported_models[i]->name);
+        B_str organization = to$str(proto_supported_models[i]->organization);
+        B_str version = to$str(proto_supported_models[i]->version);
+        gnmiQ_protoQ_ModelData model = gnmiQ_protoQ_ModelDataG_new(name, organization, version);
         supported_models_wit->$class->append(supported_models_wit, supported_models, model);
     }
 

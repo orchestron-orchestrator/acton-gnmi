@@ -77,7 +77,7 @@ actor main(env):
 
     logh = logging.Handler("gnmi.main")
     logh.add_sink(logging.ConsoleSink())
-    logh.set_output_level(logging.TRACE)
+    logh.set_output_level(logging.WARNING)
 
     target = env.argv[1]
     insecure = False
@@ -98,7 +98,7 @@ actor main(env):
             print(response)
         def _on_subscribe_response(response: proto.SubscribeResponse):
             print(response)
-        #c.capabilities(_on_capability_response)
+        c.capabilities(_on_capability_response)
         c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('counters', []), proto.PathElem('in-pkts', [])]), proto.Path([proto.PathElem('counters', []), proto.PathElem('out-pkts', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
         #c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('asdvhliuhdv', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
     def on_error(c: Client, e: str):

@@ -82,6 +82,12 @@ class ModelData:
         self.organization = organization
         self.version = version
 
+    def __str__(self):
+        return f'ModelData({self.name}, {self.organization}, {self.version})'
+
+    def __repr__(self):
+        return self.__str__()
+
 def pack_CapabilityRequest(p: CapabilityRequest) -> bytes:
     return b''
 
@@ -107,6 +113,9 @@ class CapabilityResponse:
         self.supported_models = supported_models
         self.supported_encodings = supported_encodings
         self.gnmi_version = gnmi_version
+
+    def __str__(self):
+        return f'CapabilityResponse({self.supported_models}, {self.supported_encodings}, {self.gnmi_version})'
 
     def pack(self) -> bytes:
         return pack_CapabilityResponse(self)
@@ -225,15 +234,8 @@ VALUE_ASCII_VAL = 12,
 VALUE_PROTO_BYTES = 13
 
 class TypedValue:
-    #value: value
-
-    #def __init__(self, value_value: value):
-        #pass
-        #self.value_type = value_type
-        #self.value = value_value
 
     def __str__(self):
-        #return f'TypedValue({self.value})'
         return f'TypedValue()'
 
 class NotSetValue(TypedValue):
