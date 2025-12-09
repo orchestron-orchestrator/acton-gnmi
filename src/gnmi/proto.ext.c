@@ -108,13 +108,13 @@ B_bytes gnmiQ_protoQ_pack_GetRequest(gnmiQ_protoQ_GetRequest acton_get_request) 
     // no extension support for now
     get_request.n_extension = 0;
 
-    path_acton_to_proto(&get_request.prefix, &acton_get_request->prefix);
+    path_acton_to_proto(get_request.prefix, acton_get_request->prefix);
 
     size_t n_path = acton_get_request->path->length;
     get_request.path = acton_calloc(n_path, sizeof(Gnmi__Path*));
     for(size_t i = 0; i < n_path; ++i) {
         get_request.path[i] = acton_malloc(sizeof(Gnmi__Path));
-        path_acton_to_proto(&get_request.path[i], &acton_get_request->path[i]);
+        path_acton_to_proto(get_request.path[i], (gnmiQ_protoQ_Path)acton_get_request->path->data[i]);
     }
 
     size_t n_use_models = acton_get_request->use_models->length;
@@ -331,6 +331,45 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
     }
 
     return typed_val;
+}
+
+gnmiQ_protoQ_GetResponse gnmiQ_protoQ_unpack_GetResponse(B_bytes data) {
+
+    Gnmi__GetResponse *get_response = gnmi__get_response__unpack(&gnmi_acton_alloc, data->nbytes, data->str);
+
+    size_t n_notification = get_response->n_notification;
+    B_list notifications = B_listD_new(n_notification);
+    B_Sequence notification_wit = (B_Sequence)B_SequenceD_listG_witness;
+
+    for (size_t i = 0; i < n_notification; ++i) {
+        B_i64 timestamp = toB_i64(get_response->notification[i]->timestamp);
+        gnmiQ_protoQ_Path prefix = path_proto_to_acton(get_response->notification[i]->prefix);
+        B_bool atomic = toB_bool(get_response->notification[i]->atomic);
+
+        size_t n_update = get_response->notification[i]->n_update;
+        Gnmi__Update **proto_update = get_response->notification[i]->update;
+
+        B_list updates = B_listD_new(n_update);
+        B_Sequence update_wit = (B_Sequence)B_SequenceD_listG_witness;
+
+        for (size_t j = 0; j < n_update; ++j) {
+            gnmiQ_protoQ_Path update_path = path_proto_to_acton(proto_update[j]->path);
+            gnmiQ_protoQ_TypedValue typed_val = typed_val_proto_to_acton(proto_update[j]->val);
+            gnmiQ_protoQ_Update acton_update = gnmiQ_protoQ_UpdateG_new(update_path, typed_val, toB_u32(proto_update[j]->duplicates));
+            update_wit->$class->append(update_wit, updates, acton_update);
+        }
+
+        size_t n_delete = get_response->notification[i]->n_delete_;
+        B_list deletes = B_listD_new(n_delete);
+        B_Sequence delete_wit = (B_Sequence)B_SequenceD_listG_witness;
+        for (size_t i = 0; i < n_delete; ++i) {
+            gnmiQ_protoQ_Path acton_delete = path_proto_to_acton(get_response->notification[i]->delete_[i]);
+            delete_wit->$class->append(delete_wit, deletes, acton_delete);
+	}
+
+        gnmiQ_protoQ_Notification acton_notification = gnmiQ_protoQ_NotificationG_new(timestamp, prefix, updates, deletes, atomic);
+        notification_wit->$class->append(notification_wit, notifications, acton_notification);
+    }
 }
 
 gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes data) {

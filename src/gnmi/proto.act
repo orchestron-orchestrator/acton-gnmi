@@ -88,135 +88,6 @@ class ModelData:
     def __repr__(self):
         return self.__str__()
 
-def pack_CapabilityRequest(p: CapabilityRequest) -> bytes:
-    return b''
-
-class CapabilityRequest:
-    def __init__(self):
-        pass
-
-    def pack(self) -> bytes:
-        return pack_CapabilityRequest(self)
-
-def pack_CapabilityResponse(p: CapabilityResponse) -> bytes:
-    return b''
-
-def unpack_CapabilityResponse(data: bytes) -> CapabilityResponse:
-    NotImplemented
-
-class CapabilityResponse:
-    supported_models: list[ModelData]
-    supported_encodings: list[int]
-    gnmi_version: str
-
-    def __init__(self, supported_models: list[ModelData], supported_encodings: list[int], gnmi_version: str):
-        self.supported_models = supported_models
-        self.supported_encodings = supported_encodings
-        self.gnmi_version = gnmi_version
-
-    def __str__(self):
-        return f'CapabilityResponse({self.supported_models}, {self.supported_encodings}, {self.gnmi_version})'
-
-    def pack(self) -> bytes:
-        return pack_CapabilityResponse(self)
-
-def pack_GetRequest(p: GetRequest) -> bytes:
-    NotImplemented
-
-class GetRequest:
-    prefix: Path
-    path: list[Path]
-    type: int
-    encoding: int
-    use_models: list[ModelData]
-
-    def __init__(self, prefix: Path, path: list[Path], type: int, encoding: int, use_models: list[ModelData]):
-        self.prefix = prefix
-        self.path = path
-        self.type = type
-        self.encoding = encoding
-        self.use_models = use_models
-
-    def pack(self) -> bytes:
-        return pack_GetRequest(self)
-
-def pack_GetResponse(p: GetResponse) -> bytes:
-    return b''
-
-class GetResponse:
-    def __init__(self):
-        pass
-
-    def pack(self) -> bytes:
-        return pack_GetResponse(self)
-
-def pack_SetRequest(p: SetRequest) -> bytes:
-    return b''
-
-class SetRequest:
-    def __init__(self):
-        pass
-
-    def pack(self) -> bytes:
-        return pack_SetRequest(self)
-
-def pack_SetResponse(p: SetResponse) -> bytes:
-    return b''
-
-class SetResponse:
-    def __init__(self):
-        pass
-
-    def pack(self) -> bytes:
-        return pack_SetResponse(self)
-
-def pack_SubscribeRequest(p: SubscribeRequest) -> bytes:
-    NotImplemented
-
-class Subscription:
-    path: Path
-    mode: int
-    sample_interval: u64
-    suppress_redundant: bool
-    heartbeat_interval: u64
-
-    def __init__(self, path: Path, mode: int, sample_interval: u64, suppress_redundant: bool, heartbeat_interval: u64):
-        self.path = path
-        self.mode = mode
-        self.sample_interval = sample_interval
-        self.suppress_redundant = suppress_redundant
-        self.heartbeat_interval = heartbeat_interval
-        
-class SubscriptionList:
-    prefix: Path
-    subscriptions: list[Subscription]
-    qos: u32
-    mode: int
-    allow_aggregation: bool
-    use_models: list[ModelData]
-    encoding: int
-    updates_only: bool
-
-    def __init__(self, prefix: Path, subscriptions: list[Subscription], qos: u32, mode: int, allow_aggregation: bool, use_models: list[ModelData], encoding: int, updates_only: bool):
-        self.prefix = prefix
-        self.subscriptions = subscriptions
-        self.qos = qos
-        self.mode = mode
-        self.allow_aggregation = allow_aggregation
-        self.use_models = use_models
-        self.encoding = encoding
-        self.updates_only = updates_only
-
-class SubscribeRequest:
-    # without a SubscriptionList, assume a poll request
-    subscribe: ?SubscriptionList
-
-    def __init__(self, subscribe: ?SubscriptionList):
-        self.subscribe = subscribe
-
-    def pack(self) -> bytes:
-        return pack_SubscribeRequest(self)
-
 VALUE__NOT_SET = 0,
 VALUE_STRING_VAL = 1,
 VALUE_INT_VAL = 2,
@@ -376,19 +247,6 @@ class ProtoBytesValue(TypedValue):
     def __str__(self):
         return f'ProtoBytesValue({self.value})'
 
-class Update:
-    path: Path
-    val: TypedValue
-    duplicates: u32
-
-    def __init__(self, path: Path, val: TypedValue, duplicates: u32):
-        self.path = path
-        self.val = val
-        self.duplicates = duplicates
-
-    def __str__(self):
-        return f'Update({self.path}, {self.val}, {self.duplicates})'
-
 class Notification:
     timestamp: i64
     prefix: Path
@@ -413,6 +271,151 @@ class Notification:
         updates_str += ']'
 
         return f'Notification({self.timestamp}, {self.prefix}, {updates_str}, {self.delete}, {self.atomic})'
+
+class Update:
+    path: Path
+    val: TypedValue
+    duplicates: u32
+
+    def __init__(self, path: Path, val: TypedValue, duplicates: u32):
+        self.path = path
+        self.val = val
+        self.duplicates = duplicates
+
+    def __str__(self):
+        return f'Update({self.path}, {self.val}, {self.duplicates})'
+
+
+def pack_CapabilityRequest(p: CapabilityRequest) -> bytes:
+    return b''
+
+class CapabilityRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_CapabilityRequest(self)
+
+def pack_CapabilityResponse(p: CapabilityResponse) -> bytes:
+    return b''
+
+def unpack_CapabilityResponse(data: bytes) -> CapabilityResponse:
+    NotImplemented
+
+class CapabilityResponse:
+    supported_models: list[ModelData]
+    supported_encodings: list[int]
+    gnmi_version: str
+
+    def __init__(self, supported_models: list[ModelData], supported_encodings: list[int], gnmi_version: str):
+        self.supported_models = supported_models
+        self.supported_encodings = supported_encodings
+        self.gnmi_version = gnmi_version
+
+    def __str__(self):
+        return f'CapabilityResponse({self.supported_models}, {self.supported_encodings}, {self.gnmi_version})'
+
+    def pack(self) -> bytes:
+        return pack_CapabilityResponse(self)
+
+def pack_GetRequest(p: GetRequest) -> bytes:
+    NotImplemented
+
+class GetRequest:
+    prefix: Path
+    path: list[Path]
+    type: int
+    encoding: int
+    use_models: list[ModelData]
+
+    def __init__(self, prefix: Path, path: list[Path], type: int, encoding: int, use_models: list[ModelData]):
+        self.prefix = prefix
+        self.path = path
+        self.type = type
+        self.encoding = encoding
+        self.use_models = use_models
+
+    def pack(self) -> bytes:
+        return pack_GetRequest(self)
+
+def pack_GetResponse(p: GetResponse) -> bytes:
+    return b''
+
+class GetResponse:
+    notification: list[Notification]
+
+    def __init__(self, notification):
+        self.notification = notification
+
+    def pack(self) -> bytes:
+        return pack_GetResponse(self)
+
+def pack_SetRequest(p: SetRequest) -> bytes:
+    return b''
+
+class SetRequest:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SetRequest(self)
+
+def pack_SetResponse(p: SetResponse) -> bytes:
+    return b''
+
+class SetResponse:
+    def __init__(self):
+        pass
+
+    def pack(self) -> bytes:
+        return pack_SetResponse(self)
+
+def pack_SubscribeRequest(p: SubscribeRequest) -> bytes:
+    NotImplemented
+
+class Subscription:
+    path: Path
+    mode: int
+    sample_interval: u64
+    suppress_redundant: bool
+    heartbeat_interval: u64
+
+    def __init__(self, path: Path, mode: int, sample_interval: u64, suppress_redundant: bool, heartbeat_interval: u64):
+        self.path = path
+        self.mode = mode
+        self.sample_interval = sample_interval
+        self.suppress_redundant = suppress_redundant
+        self.heartbeat_interval = heartbeat_interval
+        
+class SubscriptionList:
+    prefix: Path
+    subscriptions: list[Subscription]
+    qos: u32
+    mode: int
+    allow_aggregation: bool
+    use_models: list[ModelData]
+    encoding: int
+    updates_only: bool
+
+    def __init__(self, prefix: Path, subscriptions: list[Subscription], qos: u32, mode: int, allow_aggregation: bool, use_models: list[ModelData], encoding: int, updates_only: bool):
+        self.prefix = prefix
+        self.subscriptions = subscriptions
+        self.qos = qos
+        self.mode = mode
+        self.allow_aggregation = allow_aggregation
+        self.use_models = use_models
+        self.encoding = encoding
+        self.updates_only = updates_only
+
+class SubscribeRequest:
+    # without a SubscriptionList, assume a poll request
+    subscribe: ?SubscriptionList
+
+    def __init__(self, subscribe: ?SubscriptionList):
+        self.subscribe = subscribe
+
+    def pack(self) -> bytes:
+        return pack_SubscribeRequest(self)
 
 def pack_SubscribeResponse(p: SubscribeResponse) -> bytes:
     return b''
