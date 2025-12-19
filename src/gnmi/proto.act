@@ -341,6 +341,9 @@ class GetRequest:
 def pack_GetResponse(p: GetResponse) -> bytes:
     return b''
 
+def unpack_GetResponse(data: bytes) -> GetResponse:
+    NotImplemented
+
 class GetResponse:
     notification: list[Notification]
 
