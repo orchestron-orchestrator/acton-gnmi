@@ -318,8 +318,10 @@ class CapabilityResponse:
     def pack(self) -> bytes:
         return pack_CapabilityResponse(self)
 
-def pack_GetRequest(p: GetRequest) -> bytes:
-    NotImplemented
+ALL = 0
+CONFIG = 1
+STATE = 2
+OPERATIONAL = 3
 
 class GetRequest:
     prefix: Path
@@ -337,6 +339,9 @@ class GetRequest:
 
     def pack(self) -> bytes:
         return pack_GetRequest(self)
+
+def pack_GetRequest(p: GetRequest) -> bytes:
+    NotImplemented
 
 def pack_GetResponse(p: GetResponse) -> bytes:
     return b''
