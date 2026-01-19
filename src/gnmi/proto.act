@@ -362,8 +362,16 @@ def pack_SetRequest(p: SetRequest) -> bytes:
     return b''
 
 class SetRequest:
-    def __init__(self):
-        pass
+    prefix: Path
+    delete: list[Path]
+    replace: list[Update]
+    update: list[Update]
+
+    def __init__(self, prefix: Path, delete: list[Path], replace: list[Update], update: list[Update]):
+        self.prefix = prefix
+        self.delete = delete
+        self.replace = replace
+        self.update = update
 
     def pack(self) -> bytes:
         return pack_SetRequest(self)
