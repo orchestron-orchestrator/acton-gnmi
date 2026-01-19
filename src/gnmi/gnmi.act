@@ -91,7 +91,7 @@ actor main(env):
     target = env.argv[1]
     insecure = False
     if len(env.argv) > 2:
-        insecure = bool(env.argv[2])
+        insecure = (env.argv[2] == 'True')
 
     basic_creds = None
     if len(env.argv) > 4:
