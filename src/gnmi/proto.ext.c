@@ -131,8 +131,8 @@ B_bytes gnmiQ_protoQ_pack_GetRequest(gnmiQ_protoQ_GetRequest acton_get_request) 
         use_models[i]->version = (char*)fromB_str(acton_use_models[i]->version);
     }
 
-    get_request.type = from$int(acton_get_request->type);
-    get_request.encoding = from$int(acton_get_request->encoding);
+    get_request.type = fromB_int(acton_get_request->type);
+    get_request.encoding = fromB_int(acton_get_request->encoding);
 
     size_t buffer_size = gnmi__get_request__get_packed_size(&get_request);
 
@@ -168,9 +168,9 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
         subscribe_request.subscribe->qos = acton_malloc(sizeof(Gnmi__QOSMarking));
         gnmi__qosmarking__init(subscribe_request.subscribe->qos);
         subscribe_request.subscribe->qos->marking = fromB_u32(acton_subscription_list->qos);
-        subscribe_request.subscribe->mode = from$int(acton_subscription_list->mode);
+        subscribe_request.subscribe->mode = fromB_int(acton_subscription_list->mode);
         subscribe_request.subscribe->allow_aggregation = fromB_bool(acton_subscription_list->allow_aggregation);
-        subscribe_request.subscribe->encoding = from$int(acton_subscription_list->encoding);
+        subscribe_request.subscribe->encoding = fromB_int(acton_subscription_list->encoding);
         subscribe_request.subscribe->updates_only = fromB_bool(acton_subscription_list->updates_only);
 
         // subscriptions
@@ -187,7 +187,7 @@ B_bytes gnmiQ_protoQ_pack_SubscribeRequest(gnmiQ_protoQ_SubscribeRequest acton_s
             gnmi__path__init(subscriptions[i]->path);
             path_acton_to_proto(subscriptions[i]->path, acton_subscriptions[i]->path);
 
-            subscriptions[i]->mode = from$int(acton_subscriptions[i]->mode);
+            subscriptions[i]->mode = fromB_int(acton_subscriptions[i]->mode);
             subscriptions[i]->sample_interval = fromB_u64(acton_subscriptions[i]->sample_interval);
             subscriptions[i]->suppress_redundant = fromB_bool(acton_subscriptions[i]->suppress_redundant);
             subscriptions[i]->heartbeat_interval = fromB_u64(acton_subscriptions[i]->heartbeat_interval);
@@ -230,7 +230,7 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
     B_bytes acton_bytes_val;
     B_bytes b_bytes_val;
     B_str b_str_val;
-    B_i64 b_i64_val;
+    B_int b_i64_val;
     B_u64 b_u64_val;
     B_bool b_bool_val;
     B_str string_val;
@@ -255,7 +255,7 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_StringValueG_new(b_str_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_INT_VAL:
-            b_i64_val = toB_i64(val->int_val);
+            b_i64_val = toB_int(val->int_val);
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_IntValueG_new(b_i64_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_UINT_VAL:
@@ -281,7 +281,7 @@ gnmiQ_protoQ_TypedValue typed_val_proto_to_acton(Gnmi__TypedValue* val) {
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_DoubleValueG_new(b_float_val);
             break;
         case GNMI__TYPED_VALUE__VALUE_DECIMAL_VAL:
-            b_i64_val = toB_i64(val->decimal_val->digits);
+            b_i64_val = toB_int(val->decimal_val->digits);
             b_u32_val = toB_u32(val->decimal_val->precision);
             decimal_val = gnmiQ_protoQ_Decimal64G_new(b_i64_val, b_u32_val);
             typed_val = (gnmiQ_protoQ_TypedValue)gnmiQ_protoQ_DecimalValueG_new(decimal_val);
@@ -342,7 +342,7 @@ gnmiQ_protoQ_GetResponse gnmiQ_protoQ_unpack_GetResponse(B_bytes data) {
     B_Sequence notification_wit = (B_Sequence)B_SequenceD_listG_witness;
 
     for (size_t i = 0; i < n_notification; ++i) {
-        B_i64 timestamp = toB_i64(get_response->notification[i]->timestamp);
+        B_int timestamp = toB_int(get_response->notification[i]->timestamp);
         gnmiQ_protoQ_Path prefix = path_proto_to_acton(get_response->notification[i]->prefix);
         B_bool atomic = toB_bool(get_response->notification[i]->atomic);
 
@@ -387,7 +387,7 @@ gnmiQ_protoQ_SubscribeResponse gnmiQ_protoQ_unpack_SubscribeResponse(B_bytes dat
         case GNMI__SUBSCRIBE_RESPONSE__RESPONSE_UPDATE:
             Gnmi__Notification *proto_notif = subscribe_response->update;
 
-            B_i64 timestamp = toB_i64(proto_notif->timestamp);
+            B_int timestamp = toB_int(proto_notif->timestamp);
             gnmiQ_protoQ_Path prefix = path_proto_to_acton(proto_notif->prefix);
             B_bool atomic = toB_bool(proto_notif->atomic);
 

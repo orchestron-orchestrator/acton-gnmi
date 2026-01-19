@@ -28,16 +28,16 @@ class Any:
         return f'Any({self.type_url}, {self.value})'
     
 class Decimal64:
-    digits: i64
+    digits: int
     precision: u32
 
-    def __init__(self, digits: i64, precision: u32):
+    def __init__(self, digits: int, precision: u32):
         self.digits = digits
         self.precision = precision
 
     def __str__(self):
-        integer_digits = self.digits // (10**i64(self.precision))
-        decimal_digits = self.digits % (10**i64(self.precision))
+        integer_digits = self.digits // (10**int(self.precision))
+        decimal_digits = self.digits % (10**int(self.precision))
         return f'Decimal64({integer_digits}.{decimal_digits})'
 
 class PathElem:
@@ -126,9 +126,9 @@ class StringValue(TypedValue):
         return f'StringValue(\'{self.value}\')'
 
 class IntValue(TypedValue):
-    value: i64
+    value: int
 
-    def __init__(self, val: i64):
+    def __init__(self, val: int):
         self.value = val
 
     def __str__(self):
@@ -248,13 +248,13 @@ class ProtoBytesValue(TypedValue):
         return f'ProtoBytesValue({self.value})'
 
 class Notification:
-    timestamp: i64
+    timestamp: int
     prefix: Path
     update: list[Update]
     delete: list[Path]
     atomic: bool
 
-    def __init__(self, timestamp: i64, prefix: Path, update: list[Update], delete: list[Path], atomic: bool):
+    def __init__(self, timestamp: int, prefix: Path, update: list[Update], delete: list[Path], atomic: bool):
         self.timestamp = timestamp
         self.prefix = prefix
         self.update = update
