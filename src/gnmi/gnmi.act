@@ -101,13 +101,15 @@ actor main(env):
 
     def on_connect(c: Client):
         print("Client connected", target)
-        #c.get()
         #c.set()
         def _on_capability_response(response: proto.CapabilityResponse):
+            print(response)
+        def _on_get_response(response: proto.GetResponse):
             print(response)
         def _on_subscribe_response(response: proto.SubscribeResponse):
             print(response)
         c.capabilities(_on_capability_response)
+        c.get(_on_get_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', [])]), [proto.Path([proto.PathElem('state', [])])], proto.ALL)
         c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', [])]), [proto.Path([proto.PathElem('state', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
         #c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('counters', []), proto.PathElem('in-pkts', [])]), proto.Path([proto.PathElem('counters', []), proto.PathElem('out-pkts', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
         #c.subscribe(_on_subscribe_response, proto.Path([proto.PathElem('openconfig-interfaces:interfaces', []), proto.PathElem('interface', []), proto.PathElem('state', [])]), [proto.Path([proto.PathElem('asdvhliuhdv', [])])], proto.STREAM, proto.SAMPLE, 5000000000)
