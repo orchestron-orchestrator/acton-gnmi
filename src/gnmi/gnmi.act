@@ -86,6 +86,7 @@ actor main(env):
     logh = logging.Handler("gnmi.main")
     logh.add_sink(logging.ConsoleSink())
     logh.set_output_level(logging.WARNING)
+    logger = logging.Logger(logh)
 
     target = env.argv[1]
     insecure = False
