@@ -15,6 +15,7 @@ void gnmiQ_protoQ___ext_init__() {
 }
 
 int path_acton_to_proto(Gnmi__Path *proto_path, gnmiQ_protoQ_Path acton_path) {
+
     proto_path->origin = (char*)fromB_str(acton_path->origin);
     proto_path->target = (char*)fromB_str(acton_path->target);
 
@@ -108,6 +109,8 @@ B_bytes gnmiQ_protoQ_pack_GetRequest(gnmiQ_protoQ_GetRequest acton_get_request) 
     // no extension support for now
     get_request.n_extension = 0;
 
+    get_request.prefix = acton_malloc(sizeof(Gnmi__Path));
+    gnmi__path__init(get_request.prefix);
     path_acton_to_proto(get_request.prefix, acton_get_request->prefix);
 
     size_t n_path = acton_get_request->path->length;
