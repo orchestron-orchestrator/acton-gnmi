@@ -337,6 +337,9 @@ class GetRequest:
         self.encoding = encoding
         self.use_models = use_models
 
+    def __str__(self):
+        return f'GetRequest({self.prefix}, {self.path}, {self.type}, {self.encoding}, {self.use_models})'
+
     def pack(self) -> bytes:
         return pack_GetRequest(self)
 
@@ -354,6 +357,9 @@ class GetResponse:
 
     def __init__(self, notification):
         self.notification = notification
+
+    def __str__(self):
+        return f'GetResponse({self.notification})'
 
     def pack(self) -> bytes:
         return pack_GetResponse(self)
