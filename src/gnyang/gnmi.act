@@ -11,9 +11,9 @@ import yang.schema as yschema
 extension proto.Notification(YangData):
 
     def take_container(self, schema: yschema.DContainer, name: str, ns_qualified: bool, path: list[PathElement]=[]) -> ?(op: ?str, val: ?value):
-        updates, deletes = select_notif_paths(self, name)
+        updates, deletes = select_notif_paths(self, schema.name)
         new_prefix = proto.Path(self.prefix.elems.copy(), self.prefix.origin, self.prefix.target)
-        new_prefix.elems.append(proto.PathElem(name, []))
+        new_prefix.elems.append(proto.PathElem(schema.name, []))
 
         if len(updates) > 0:
             return None, proto.Notification(self.timestamp, new_prefix, updates, deletes, self.atomic)
@@ -25,7 +25,7 @@ extension proto.Notification(YangData):
         new_path = path + [PathElement(schema)]
 
         values: list[(op: ?str, key: dict[str, value], val: value)] = []
-        updates, deletes = select_notif_matches(self, name)
+        updates, deletes = select_notif_matches(self, schema.name)
 
         # Can't hash the key set but it would be efficient
         #list_dict: dict[list[(str, str)], list[proto.Update]] = {}
@@ -96,7 +96,7 @@ extension proto.Notification(YangData):
     def take_leaf(self, root: yschema.DRoot, schema: yschema.DLeaf, name: str, ns_qualified: bool, path: list[PathElement]=[]) -> ?(op: ?str, t: str, val: ?value):
         new_path = path + [PathElement(schema)]
 
-        updates, deletes = select_notif_paths(self, name)
+        updates, deletes = select_notif_paths(self, schema.name)
 
         if len(updates) == 1 and len(deletes) == 0:
             tv = try_parse_gnmi_value(updates[0].val, schema, schema.type_, new_path, root)
@@ -108,7 +108,7 @@ extension proto.Notification(YangData):
         # last element's keys so the non-optional key still resolves.
         if len(self.prefix.elems) > 0:
             for k, v in self.prefix.elems[-1].keys:
-                if k == name:
+                if k == schema.name:
                     tv = try_parse_leaf_value(v, schema, schema.type_, new_path, root)
                     if tv is not None:
                         return (op=None, t=tv.t, val=tv.val)
@@ -120,7 +120,7 @@ extension proto.Notification(YangData):
         new_path = path + [PathElement(schema)]
         values: list[(op: ?str, t: str, val: ?value)] = []
 
-        updates, deletes = select_notif_paths(self, name)
+        updates, deletes = select_notif_paths(self, schema.name)
 
         leaflist_path: ?proto.Path = None
         for update in updates:
