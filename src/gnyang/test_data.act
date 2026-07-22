@@ -337,6 +337,19 @@ def _test_y1_gnmi():
         fraction-digits 2;
       }
     }
+    leaf flags {
+      // positions contradict alphabetical order to prove the decoded value
+      // is in canonical (position) order
+      type bits {
+        bit zulu {
+          position 0;
+        }
+        bit alpha {
+          position 1;
+        }
+        bit mike;
+      }
+    }
   }
 }"""
 
@@ -346,7 +359,8 @@ def _test_y1_gnmi():
                             Update(Path([PathElem('c1', []), PathElem('l2', [('k1', 'Key 1')]), PathElem('v1', [])], '', ''), StringValue('Value for v1'), 0),
                             Update(Path([PathElem('c1', []), PathElem('lrf2', []) ], '', ''), StringValue('Key 1'), 0),
                             Update(Path([PathElem('c1', []), PathElem('ll1', []) ], '', ''), LeafListValue([StringValue('Item 1'), StringValue('Item 2')]), 0),
-                            Update(Path([PathElem('c1', []), PathElem('ll3', []) ], '', ''), LeafListValue([DoubleValue(3.14), DoubleValue(2.72)]), 0)
+                            Update(Path([PathElem('c1', []), PathElem('ll3', []) ], '', ''), LeafListValue([DoubleValue(3.14), DoubleValue(2.72)]), 0),
+                            Update(Path([PathElem('c1', []), PathElem('flags', []) ], '', ''), StringValue('mike alpha zulu'), 0)
                             ],
                            [], False)
 
