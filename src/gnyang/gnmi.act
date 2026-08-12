@@ -85,7 +85,7 @@ extension proto.Notification(YangData):
             for keyname, keyval in new_prefix.elems[-1].keys:
                 schema_key = schema_keys.get(keyname)
                 if root is not None and schema_key is not None:
-                    tv = try_parse_leaf_value(keyval, schema_key, schema_key.type_, new_path, root)
+                    tv = try_parse_leaf_value(keyval, schema_key, schema_key.type, new_path, root)
                     if tv is not None:
                         key[keyname] = tv.val
 
@@ -99,7 +99,7 @@ extension proto.Notification(YangData):
         updates, deletes = select_notif_paths(self, schema.name)
 
         if len(updates) == 1 and len(deletes) == 0:
-            tv = try_parse_gnmi_value(updates[0].val, schema, schema.type_, new_path, root)
+            tv = try_parse_gnmi_value(updates[0].val, schema, schema.type, new_path, root)
             if tv is not None:
                 return (op=None, t=tv.t, val=tv.val)
 
@@ -109,7 +109,7 @@ extension proto.Notification(YangData):
         if len(self.prefix.elems) > 0:
             for k, v in self.prefix.elems[-1].keys:
                 if k == schema.name:
-                    tv = try_parse_leaf_value(v, schema, schema.type_, new_path, root)
+                    tv = try_parse_leaf_value(v, schema, schema.type, new_path, root)
                     if tv is not None:
                         return (op=None, t=tv.t, val=tv.val)
 
@@ -137,7 +137,7 @@ extension proto.Notification(YangData):
             
             if isinstance(value, proto.LeafListValue):
                 for item in value.value:
-                    tv = try_parse_gnmi_value(item, schema, schema.type_, new_path, root)
+                    tv = try_parse_gnmi_value(item, schema, schema.type, new_path, root)
                     if tv is not None:
                         values.append((op=None, t=tv.t, val=tv.val))
 
