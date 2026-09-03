@@ -1,7 +1,7 @@
 import testing
 
 from proto import Notification, Update, Path, PathElem
-from proto import StringValue, DoubleValue, LeafListValue, BoolValue
+from proto import StringValue, DoubleValue, DecimalValue, Decimal64, LeafListValue, BoolValue
 from gnyang.gnmi import from_gnmi_notif, select_notif_matches, select_notif_paths
 
 import yang
@@ -359,7 +359,7 @@ def _test_y1_gnmi():
                             Update(Path([PathElem('c1', []), PathElem('l2', [('k1', 'Key 1')]), PathElem('v1', [])], '', ''), StringValue('Value for v1'), 0),
                             Update(Path([PathElem('c1', []), PathElem('lrf2', []) ], '', ''), StringValue('Key 1'), 0),
                             Update(Path([PathElem('c1', []), PathElem('ll1', []) ], '', ''), LeafListValue([StringValue('Item 1'), StringValue('Item 2')]), 0),
-                            Update(Path([PathElem('c1', []), PathElem('ll3', []) ], '', ''), LeafListValue([DoubleValue(3.14), DoubleValue(2.72)]), 0),
+                            Update(Path([PathElem('c1', []), PathElem('ll3', []) ], '', ''), LeafListValue([DoubleValue(3.14), DecimalValue(Decimal64(272, 2))]), 0),
                             Update(Path([PathElem('c1', []), PathElem('flags', []) ], '', ''), StringValue('mike alpha zulu'), 0)
                             ],
                            [], False)

@@ -224,7 +224,8 @@ def try_parse_gnmi_value(gnmi_value: proto.TypedValue, schema_node: yschema.DNod
     elif isinstance(schema_type, yschema.DTypeDecimal64):
         if isinstance(gnmi_value, proto.DecimalValue):
             significand = gnmi_value.value.digits
-            exponent = int(gnmi_value.value.precision)
+            # gNMI precision counts the digits after the decimal point
+            exponent = -int(gnmi_value.value.precision)
             val = Decimal(significand, exponent)
         elif isinstance(gnmi_value, proto.DoubleValue):
             val = Decimal.try_parse(str(gnmi_value.value))
